@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Join the List</title>
+  <style>
+    body { font-family: system-ui, Arial, sans-serif; max-width: 640px; margin: 10vh auto; padding: 0 20px; }
+    form { display: grid; gap: 12px; }
+    input, button { padding: 12px; font-size: 16px; }
+    .msg { margin-top: 8px; }
+  </style>
+</head>
+<body>
+  <h1>Get Tour Updates</h1>
+  <p>Drop your email and city to get notified when we’re near you.</p>
+
+  <form id="signup">
+    <input type="email" name="email" placeholder="Email" required />
+    <input type="text" name="city" placeholder="City (e.g., Toronto)" />
+    <button type="submit">Notify Me</button>
+    <div class="msg" id="msg"></div>
+  </form>
+
+  <script>
+    const ENDPOINT = "PASTE_YOUR_APPS_SCRIPT_WEB_APP_URL_HERE";
+
+    document.getElementById('signup').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const form = e.target;
+      const msg = document.getElementById('msg');
+      msg.textContent = "Submitting…";
+
+      const payload = {
+        email: form.email.value,
+        city: form.city.value,
+        user_agent: navigator.userAgent
+      };
+
+      try {
+        const res = await fetch(ENDPOINT, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload),
+        });
+        const data = await res.json();
+        if (data.ok) {
+          msg.textContent = "Thanks! You’re on the list.";
+          form.reset();
+        } else {
+          msg.textContent = "Error: " + (data.error || "Try again.");
+        }
+      } catch (err) {
+        msg.textContent = "Network error. Please try again.";
+      }
+    });
+  </script>
+</body>
+</html>
